@@ -1,10 +1,3 @@
-/*
- * @Author       : Chivier Humber
- * @Date         : 2021-09-14 21:44:05
- * @LastEditors  : Chivier Humber
- * @LastEditTime : 2021-10-31 15:59:54
- * @Description  : file content
- */
 #pragma once
 
 #include <iostream>

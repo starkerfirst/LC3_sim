@@ -1,40 +1,33 @@
-/*
- * @Author       : Chivier Humber
- * @Date         : 2021-09-15 19:41:16
- * @LastEditors  : Chivier Humber
- * @LastEditTime : 2021-11-24 05:33:38
- * @Description  : file content
- */
 #include "simulator.h"
 
 namespace virtual_machine_nsp {
-template <typename T, unsigned B>
+template <typename T, unsigned B> //B: bit number of x
 inline T SignExtend(const T x) {
     // Extend the number
     // TO BE DONE
     T num = x;
-    T number = 0;
+    T num_ext = 0;
     for (unsigned i = 0; i < B; ++i) {
         if ((num >> i) & 0b1) {
             if (i == B - 1) {
-                number -= pow(2, i);
+                num_ext -= pow(2, i);
             } else {
-                number += pow(2, i);
+                num_ext += pow(2, i);
             }
         }
     }
-    return number;
+    return num_ext;
 }
 
 void virtual_machine_tp::UpdateCondRegister(int regname) {
     // Update the condition register
     // TO BE DONE
     if (reg[regname] > 0) {
-        reg[R_COND] = 1;
-    } else if (reg[regname < 0]) {
-        reg[R_COND] = 4;
+        reg[R_COND] = 0x1;
+    } else if (reg[regname] < 0) {
+        reg[R_COND] = 0x100;
     } else {
-        reg[R_COND] = 2;
+        reg[R_COND] = 0x10;
     }
 }
 
@@ -163,7 +156,7 @@ void virtual_machine_tp::VM_ST(int16_t inst) {
 }
 
 void virtual_machine_tp::VM_STI(int16_t inst) {
-    // TO BE DONEint16_t sr = (inst >> 9) & 0x7;
+    // TO BE DONE
     int16_t sr = (inst >> 9) & 0x7;
     int16_t pc_offset = SignExtend<int16_t, 9>(inst & 0x1FF);
     mem[mem[reg[R_PC] + pc_offset]] = reg[sr];
@@ -179,10 +172,12 @@ void virtual_machine_tp::VM_STR(int16_t inst) {
 
 void virtual_machine_tp::VM_TRAP(int16_t inst) {
     int trapnum = inst & 0xFF;
-    // if (trapnum == 0x25)
-    //     exit(0);
-    // TODO: build trap program
-    if (trapnum == 0x20) {
+    // TO BE DONE: build trap program
+    // right now we only have 2 conditions
+    if (trapnum == 0x25)//HALT
+        exit(0);
+    if (trapnum == 0x20)//IN
+    {
         std::cin >> reg[0];
     }
 }
@@ -342,14 +337,14 @@ int16_t virtual_machine_tp::NextStep() {
         }
         VM_TRAP(current_instruct);
         break;
-        default:
+        /* default:
         VM_RTI(current_instruct);
-        break;
+        break; */
     }
+    // END
 
     if (current_instruct == 0) {
-        // END
-        // TODO: add more detailed judge information
+        // TO BE DONE: add more detailed judge information (initializer failed ???)
         return 0;
     }
     return reg[R_PC];

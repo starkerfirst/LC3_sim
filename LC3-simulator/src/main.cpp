@@ -1,23 +1,18 @@
-/*
- * @Author       : Chivier Humber
- * @Date         : 2021-09-14 21:41:49
- * @LastEditors  : Chivier Humber
- * @LastEditTime : 2021-11-24 05:33:45
- * @Description  : file content
- */
 #include "simulator.h"
 
 using namespace virtual_machine_nsp;
 namespace po = boost::program_options;
 
 bool gIsSingleStepMode = false;
-bool gIsDetailedMode = false;
+bool gIsDetailedMode = false; //output every info about regs, insts and computing
 std::string gInputFileName = "input.txt";
 std::string gRegisterStatusFileName = "register.txt";
 std::string gOutputFileName = "";
 int gBeginningAddress = 0x3000;
 
 int main(int argc, char **argv) {
+ 
+    // shell argument parser (using boost)
     po::options_description desc{"\e[1mLC3 SIMULATOR\e[0m\n\n\e[1mOptions\e[0m"};
     desc.add_options()                                                                             //
         ("help,h", "Help screen")                                                                  //
@@ -55,26 +50,33 @@ int main(int argc, char **argv) {
         gIsDetailedMode = true;
     }
 
+
+    // simulator construction
     virtual_machine_tp virtual_machine(gBeginningAddress, gInputFileName, gRegisterStatusFileName);
-    int halt_flag = true;
-    int time_flag = 0;
-    while(halt_flag) {
-        // Single step
-        // TO BE DONE
+    int halt_flag = true; 
+    int time_flag = 0; //cycle count
+    while(halt_flag) 
+    {
         if (gIsSingleStepMode) {
-            if (getchar() == '\n') {
+            if (getchar() == '\n')  //when clicking enter, go into next cycle
+            {
                 halt_flag = virtual_machine.NextStep();
-                std::cout << virtual_machine.reg << std::endl;
-                continue;
+                ++time_flag;
             }
-        } else {
-            halt_flag = virtual_machine.NextStep();
         }
-        if (gIsDetailedMode)
-            std::cout << virtual_machine.reg << std::endl;
-        ++time_flag;
+        else if(gIsDetailedMode)
+        {
+            if (getchar() == '\n')  //when clicking enter, go into next cycle
+            {
+                halt_flag = virtual_machine.NextStep();
+                ++time_flag;
+                std::cout << virtual_machine.reg << std::endl;
+            }
+        } 
+        else exit(-1);
     }
 
+    std::cout << "HALT!!! " << std::endl;
     std::cout << virtual_machine.reg << std::endl;
     std::cout << "cycle = " << time_flag << std::endl;
     return 0;
